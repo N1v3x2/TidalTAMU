@@ -6,10 +6,6 @@ import re
 
 file_path = 'grd20231EN.pdf'
 
-# with fitz.open(file_path) as doc:
-#     file_text = ''.join([page.get_text() for page in doc])
-#     print(file_text)
-
 
 def read_grade_distributions(path):
     # Extract text using PDFMiner
@@ -28,7 +24,9 @@ def read_grade_distributions(path):
         r'.*?'                              # Non-greedy match for any characters until next grade
         r'(\d+[.]\d\d)\s*%'                 # Number of D grades
         r'.*?'                              # Non-greedy match for any characters until next grade
-        r'(\d+[.]\d\d)\s*%',                # Number of F grades
+        r'(\d+[.]\d\d)\s*%'                 # Number of F grades
+        r'.*?'
+        r'(\d+\.\d{3})',                    # Average Course GPA
         re.DOTALL                           # DOTALL to match across multiple lines
     )
 
@@ -48,18 +46,14 @@ def grade_to_points(grade):
     return grade_dict.get(grade, None)
 
 
-def read_grade_distributions(path):
-    text = extract_text(path)
-    print(text)
-
-    # Split the text into lines
-    lines = text.split('\n')
+def read_transcript(path):
+    text = ''.join(page.get_text() for page in fitz.open(path))
 
     # Initialize an empty list to hold course data
     courses = []
 
     # Regex patterns for extracting course data
-    course_pattern = r'(\w{4})\s+(\d{3})\s+(.+?)\s+(\d+\.\d{3})\s+(\w+|\d+\.\d{3})'
+    course_pattern = r'(\w{4})\s+(\d{3})\s+(.+?)\s+(\d+\.\d{3})\s+([A-F])\s+\d+\.\d{3}'
     gpa_pattern = r'GPA:\s+(\d+\.\d{3})'
 
     # Iterate through lines to extract course data
@@ -67,14 +61,16 @@ def read_grade_distributions(path):
         subj, num, title, cred, grade = match
         courses.append({'Subject': subj, 'Number': num, 'Title': title, 'Credit': float(cred), 'Grade': grade})
 
-    print(courses)
+    # Convert list of dictionaries to DataFrame
+    df = pd.DataFrame(courses)
 
-    # # Convert list of dictionaries to DataFrame
-    # df = pd.DataFrame(courses)
-    #
-    # # Apply function to DataFrame
-    # df['Grade Points'] = df['Grade'].apply(grade_to_points)
-    #
+    print(df)
+
+    # Apply function to DataFrame
+    df['Grade Points'] = df['Grade'].apply(grade_to_points)
+
+    print()
+
     # # Calculate GPA for each course
     # df['GPA Contribution'] = df['Grade Points'] * df['Credit']
     #
@@ -90,4 +86,5 @@ def read_grade_distributions(path):
     # print(f'Cumulative GPA: {cumulative_gpa:.2f}')
 
 
-read_grade_distributions('transcript.pdf')
+# read_transcript('transcript.pdf')
+read_grade_distributions(file_path)
