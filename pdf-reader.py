@@ -64,27 +64,11 @@ def read_transcript(path):
     # Convert list of dictionaries to DataFrame
     df = pd.DataFrame(courses)
 
-    print(df)
-
     # Apply function to DataFrame
     df['Grade Points'] = df['Grade'].apply(grade_to_points)
 
-    print()
-
-    # # Calculate GPA for each course
-    # df['GPA Contribution'] = df['Grade Points'] * df['Credit']
-    #
-    # # Group by semester to calculate semester GPAs
-    # semester_gpa = df.groupby('Semester')['GPA Contribution', 'Credit'].sum()
-    # semester_gpa['GPA'] = semester_gpa['GPA Contribution'] / semester_gpa['Credit']
-    #
-    # # Calculate cumulative GPA
-    # cumulative_gpa = semester_gpa['GPA Contribution'].sum() / semester_gpa['Credit'].sum()
-    #
-    # # Display results
-    # print(semester_gpa)
-    # print(f'Cumulative GPA: {cumulative_gpa:.2f}')
+    print(df)
 
 
-# read_transcript('transcript.pdf')
-read_grade_distributions(file_path)
+read_transcript('transcript.pdf')
+# read_grade_distributions(file_path)
