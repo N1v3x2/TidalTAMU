@@ -3,6 +3,8 @@ from sklearn.preprocessing import StandardScaler
 from sklearn.model_selection import train_test_split
 from sklearn.linear_model import LogisticRegression
 
+import scipy
+
 
 def predict_final(work, extracurricular, partner, studyhours, rf1, rf2, seminar, projects, attendance, midtermprep,
                   notes, listen, prevgpa):
@@ -65,8 +67,8 @@ def correlation_with_grade(variable):
     # alpha of 0.05
     df = pd.read_csv('StudentsPerformance_with_headers.csv')
     contigency = pd.crosstab(df[variable], df['GRADE'])
-    chi2, p, dof, expected = stats.chi2_contingency(contigency)
-    critical_value = stats.chi2.ppf(0.05, dof)
+    chi2, p, dof, expected = scipy.stats.chi2_contingency(contigency)
+    critical_value = scipy.stats.chi2.ppf(0.05, dof)
     if chi2 > critical_value:
         print(f"The test is significance, {variable} and Grades are related")
     else:
@@ -77,10 +79,10 @@ def correlation_with_grade(variable):
 # correlation_with_grade("Additional work")
 # correlation_with_grade("Regular artistic or sports activity")
 # correlation_with_grade("Do you have a partner")
-# correlation_with_grade("Mothers education")
-# correlation_with_grade("Father education ")
-# correlation_with_grade("Mothers occupation")
-# correlation_with_grade("Father occupation")
+# correlation_with_grade("Mother's education")
+# correlation_with_grade("Father's education ")
+# correlation_with_grade("Mother's occupation")
+# correlation_with_grade("Father's occupation")
 # correlation_with_grade("Weekly study hours")
 # correlation_with_grade("Reading frequency")
 # correlation_with_grade("Reading frequency Academic")
