@@ -1,31 +1,36 @@
-from PyPDF2 import PdfReader
-import os
+from pdfminer.high_level import extract_text
+import re
 
-# File path
 file_path = 'grd20231EN.pdf'
 
-# Check if the file exists
-if os.path.exists(file_path):
-    try:
-        # Open the PDF file
-        with open(file_path, 'rb') as file:
-            reader = PdfReader(file)
+# Extract text using PDFMiner
+text_pdfminer = extract_text(file_path)
 
-            # Number of pages in the PDF
-            num_pages = len(reader.pages)
+# Display the first 500 characters of the extracted text for a preview
+preview_text_pdfminer = text_pdfminer[:500]
 
-            # Extract text from each page
-            text = ''
-            for page_number in range(num_pages):
-                page_obj = reader.pages[page_number]
-                text += page_obj.extract_text()
+# Regular Expression to match the class data pattern
+# This pattern needs to be refined based on the new text structure
+class_data_pattern_pdfminer = re.compile(
+    r'(AERO-\d+-\d+)\s*'  # Course code pattern, e.g., AERO-201-500
+    r'.*?'                # Non-greedy match for any characters until grade percentages
+    r'(\d+)\s*%'          # Number of A grades
+    r'.*?'                # Non-greedy match for any characters until next grade
+    r'(\d+)\s*%'          # Number of B grades
+    r'.*?'                # Non-greedy match for any characters until next grade
+    r'(\d+)\s*%'          # Number of C grades
+    r'.*?'                # Non-greedy match for any characters until next grade
+    r'(\d+)\s*%'          # Number of D grades
+    r'.*?'                # Non-greedy match for any characters until next grade
+    r'(\d+)\s*%',         # Number of F grades
+    re.DOTALL             # DOTALL to match across multiple lines
+)
 
-        # Display the first 500 characters of the extracted text for a preview
-        preview_text = text[:500]
-    except Exception as e:
-        preview_text = f"An error occurred: {e}"
-else:
-    preview_text = "File does not exist."
+# Find all matches in the text
+class_data_matches_pdfminer = class_data_pattern_pdfminer.findall(text_pdfminer)
 
-print(preview_text)
+# Preview the first few matches
+print(class_data_matches_pdfminer[:5])  # Display first 5 matches for preview
+
+
 
